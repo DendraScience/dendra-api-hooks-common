@@ -1,6 +1,6 @@
 {
   "name": "@dendra-science/api-hooks-common",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Useful hooks for use with Dendra/Feathers API services.",
   "license": "BSD-2-Clause-FreeBSD",
   "author": "J. Scott Smith <scott@newleafsolutionsinc.com>",
@@ -24,21 +24,21 @@
   },
   "dependencies": {
     "@dendra-science/utils": "0.0.1",
-    "feathers-hooks-common": "^3.7.2"
+    "feathers-hooks-common": "^3.10.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-preset-es2015-node6": "^0.4.0",
-    "chai": "^4.1.1",
-    "eslint": "^4.4.1",
+    "chai": "^4.1.2",
+    "eslint": "^4.13.1",
     "eslint-config-standard": "^10.2.1",
-    "eslint-plugin-import": "^2.7.0",
-    "eslint-plugin-node": "^5.1.1",
-    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^3.0.1",
-    "mocha": "^3.5.0",
-    "mongodb": "^2.2.31"
+    "mocha": "^3.5.3",
+    "mongodb": "^2.2.33"
   },
   "optionalDependencies": {
     "fsevents": "^1.0.0"

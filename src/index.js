@@ -87,9 +87,6 @@ export function splitList (path, sep = ',', options) {
 
 export function timestamp () {
   return (hook) => {
-    delete hook.data.created_at
-    delete hook.data.updated_at
-
     switch (hook.method) {
       case 'create':
         hook.data.created_at = new Date()

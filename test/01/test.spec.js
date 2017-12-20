@@ -259,7 +259,7 @@ describe('Module', function () {
     hooks.timestamp()(hook)
 
     expect(hook.data).to.have.property('something', 'something')
-    expect(hook.data).to.not.have.property('created_at')
+    expect(hook.data).to.have.property('created_at', 'created_at')
     expect(hook.data).to.have.property('updated_at').to.be.a('date')
   })
 
@@ -276,7 +276,7 @@ describe('Module', function () {
     hooks.timestamp()(hook)
 
     expect(hook.data).to.have.property('something', 'something')
-    expect(hook.data).to.not.have.property('created_at')
+    expect(hook.data).to.have.property('created_at', 'created_at')
     expect(hook.data).to.have.property('updated_at').to.be.a('date')
   })
 
