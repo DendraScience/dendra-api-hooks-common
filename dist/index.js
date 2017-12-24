@@ -7,6 +7,7 @@ exports.coerce = coerce;
 exports.coerceQuery = coerceQuery;
 exports.splitList = splitList;
 exports.timestamp = timestamp;
+exports.userstamp = userstamp;
 exports.uniqueArray = uniqueArray;
 
 var _feathersHooksCommon = require('feathers-hooks-common');
@@ -68,15 +69,21 @@ function queryCoercer(obj, path) {
 
 function coerce() {
   return hook => {
-    if (typeof hook.data === 'undefined') return;
+    if (typeof hook.data === 'undefined') return hook;
+
     hook.data = (0, _utils.treeMap)(hook.data, coercer);
+
+    return hook;
   };
 }
 
 function coerceQuery() {
   return hook => {
-    if (typeof hook.params.query !== 'object') return;
+    if (typeof hook.params.query !== 'object') return hook;
+
     hook.params.query = (0, _utils.treeMap)(hook.params.query, queryCoercer);
+
+    return hook;
   };
 }
 
@@ -88,12 +95,14 @@ function splitList(path, sep = ',', options) {
 
   return hook => {
     const value = (0, _feathersHooksCommon.getByDot)(hook, path);
-    if (typeof value !== 'string') return;
+    if (typeof value !== 'string') return hook;
 
     let ary = value.split(sep);
     if (opts.trim) ary = ary.map(item => item.trim()).filter(item => item.length > 0);
 
     (0, _feathersHooksCommon.setByDot)(hook, path, opts.unique ? [...new Set(ary)] : ary);
+
+    return hook;
   };
 }
 
@@ -109,6 +118,29 @@ function timestamp() {
         hook.data.updated_at = new Date();
         break;
     }
+
+    return hook;
+  };
+}
+
+function userstamp() {
+  return hook => {
+    if (typeof hook.params.user !== 'object') return hook;
+
+    const id = hook.params.user._id;
+
+    switch (hook.method) {
+      case 'create':
+        hook.data.created_by = id;
+        hook.data.updated_by = id;
+        break;
+      case 'update':
+      case 'patch':
+        hook.data.updated_by = id;
+        break;
+    }
+
+    return hook;
   };
 }
 
@@ -116,5 +148,7 @@ function uniqueArray(path) {
   return hook => {
     const ary = (0, _feathersHooksCommon.getByDot)(hook, path);
     if (Array.isArray(ary)) (0, _feathersHooksCommon.setByDot)(hook, path, [...new Set(ary)]);
+
+    return hook;
   };
 }

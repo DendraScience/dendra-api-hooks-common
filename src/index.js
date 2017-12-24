@@ -56,15 +56,21 @@ function queryCoercer (obj, path) {
 
 export function coerce () {
   return (hook) => {
-    if (typeof hook.data === 'undefined') return
+    if (typeof hook.data === 'undefined') return hook
+
     hook.data = treeMap(hook.data, coercer)
+
+    return hook
   }
 }
 
 export function coerceQuery () {
   return (hook) => {
-    if (typeof hook.params.query !== 'object') return
+    if (typeof hook.params.query !== 'object') return hook
+
     hook.params.query = treeMap(hook.params.query, queryCoercer)
+
+    return hook
   }
 }
 
@@ -76,12 +82,14 @@ export function splitList (path, sep = ',', options) {
 
   return (hook) => {
     const value = getByDot(hook, path)
-    if (typeof value !== 'string') return
+    if (typeof value !== 'string') return hook
 
     let ary = value.split(sep)
     if (opts.trim) ary = ary.map(item => item.trim()).filter(item => item.length > 0)
 
     setByDot(hook, path, opts.unique ? [...new Set(ary)] : ary)
+
+    return hook
   }
 }
 
@@ -97,6 +105,29 @@ export function timestamp () {
         hook.data.updated_at = new Date()
         break
     }
+
+    return hook
+  }
+}
+
+export function userstamp () {
+  return (hook) => {
+    if (typeof hook.params.user !== 'object') return hook
+
+    const id = hook.params.user._id
+
+    switch (hook.method) {
+      case 'create':
+        hook.data.created_by = id
+        hook.data.updated_by = id
+        break
+      case 'update':
+      case 'patch':
+        hook.data.updated_by = id
+        break
+    }
+
+    return hook
   }
 }
 
@@ -104,5 +135,7 @@ export function uniqueArray (path) {
   return (hook) => {
     const ary = getByDot(hook, path)
     if (Array.isArray(ary)) setByDot(hook, path, [...new Set(ary)])
+
+    return hook
   }
 }

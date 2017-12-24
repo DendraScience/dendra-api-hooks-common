@@ -280,6 +280,72 @@ describe('Module', function () {
     expect(hook.data).to.have.property('updated_at').to.be.a('date')
   })
 
+  it('should userstamp create', function () {
+    const hook = {
+      data: {
+        created_by: 'created_by',
+        updated_by: 'updated_by',
+        something: 'something'
+      },
+      method: 'create',
+      params: {
+        user: {
+          _id: 'user-id'
+        }
+      }
+    }
+
+    hooks.userstamp()(hook)
+
+    expect(hook.data).to.have.property('something', 'something')
+    expect(hook.data).to.have.property('created_by', 'user-id')
+    expect(hook.data).to.have.property('updated_by', 'user-id')
+  })
+
+  it('should userstamp update', function () {
+    const hook = {
+      data: {
+        created_by: 'created_by',
+        updated_by: 'updated_by',
+        something: 'something'
+      },
+      method: 'update',
+      params: {
+        user: {
+          _id: 'user-id'
+        }
+      }
+    }
+
+    hooks.userstamp()(hook)
+
+    expect(hook.data).to.have.property('something', 'something')
+    expect(hook.data).to.have.property('created_by', 'created_by')
+    expect(hook.data).to.have.property('updated_by', 'user-id')
+  })
+
+  it('should userstamp patch', function () {
+    const hook = {
+      data: {
+        created_by: 'created_by',
+        updated_by: 'updated_by',
+        something: 'something'
+      },
+      method: 'patch',
+      params: {
+        user: {
+          _id: 'user-id'
+        }
+      }
+    }
+
+    hooks.userstamp()(hook)
+
+    expect(hook.data).to.have.property('something', 'something')
+    expect(hook.data).to.have.property('created_by', 'created_by')
+    expect(hook.data).to.have.property('updated_by', 'user-id')
+  })
+
   it('should unique array values', function () {
     const hook = {
       data: {
