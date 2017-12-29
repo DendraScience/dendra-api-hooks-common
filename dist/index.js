@@ -108,14 +108,23 @@ function splitList(path, sep = ',', options) {
 
 function timestamp() {
   return hook => {
+    const date = new Date();
+
+    let items = (0, _feathersHooksCommon.getItems)(hook);
+    if (!Array.isArray(items)) items = [items];
+
     switch (hook.method) {
       case 'create':
-        hook.data.created_at = new Date();
-        hook.data.updated_at = hook.data.created_at;
+        items.forEach(item => {
+          item.created_at = date;
+          item.updated_at = date;
+        });
         break;
       case 'update':
       case 'patch':
-        hook.data.updated_at = new Date();
+        items.forEach(item => {
+          item.updated_at = date;
+        });
         break;
     }
 
@@ -129,14 +138,21 @@ function userstamp() {
 
     const id = hook.params.user._id;
 
+    let items = (0, _feathersHooksCommon.getItems)(hook);
+    if (!Array.isArray(items)) items = [items];
+
     switch (hook.method) {
       case 'create':
-        hook.data.created_by = id;
-        hook.data.updated_by = id;
+        items.forEach(item => {
+          item.created_by = id;
+          item.updated_by = id;
+        });
         break;
       case 'update':
       case 'patch':
-        hook.data.updated_by = id;
+        items.forEach(item => {
+          item.updated_by = id;
+        });
         break;
     }
 

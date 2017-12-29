@@ -236,7 +236,8 @@ describe('Module', function () {
         updated_at: 'updated_at',
         something: 'something'
       },
-      method: 'create'
+      method: 'create',
+      type: 'before'
     }
 
     hooks.timestamp()(hook)
@@ -246,6 +247,32 @@ describe('Module', function () {
     expect(hook.data).to.have.property('updated_at').to.be.a('date')
   })
 
+  it('should timestamp create multiple', function () {
+    const hook = {
+      data: [{
+        created_at: 'created_at',
+        updated_at: 'updated_at',
+        something: 'something'
+      }, {
+        created_at: 'created_at',
+        updated_at: 'updated_at',
+        something: 'something-else'
+      }],
+      method: 'create',
+      type: 'before'
+    }
+
+    hooks.timestamp()(hook)
+
+    expect(hook).to.have.nested.property('data.0.something', 'something')
+    expect(hook).to.have.nested.property('data.0.created_at').to.be.a('date')
+    expect(hook).to.have.nested.property('data.0.updated_at').to.be.a('date')
+
+    expect(hook).to.have.nested.property('data.1.something', 'something-else')
+    expect(hook).to.have.nested.property('data.1.created_at').to.be.a('date')
+    expect(hook).to.have.nested.property('data.1.updated_at').to.be.a('date')
+  })
+
   it('should timestamp update', function () {
     const hook = {
       data: {
@@ -253,7 +280,8 @@ describe('Module', function () {
         updated_at: 'updated_at',
         something: 'something'
       },
-      method: 'update'
+      method: 'update',
+      type: 'before'
     }
 
     hooks.timestamp()(hook)
@@ -270,7 +298,8 @@ describe('Module', function () {
         updated_at: 'updated_at',
         something: 'something'
       },
-      method: 'patch'
+      method: 'patch',
+      type: 'before'
     }
 
     hooks.timestamp()(hook)
@@ -288,6 +317,7 @@ describe('Module', function () {
         something: 'something'
       },
       method: 'create',
+      type: 'before',
       params: {
         user: {
           _id: 'user-id'
@@ -302,6 +332,37 @@ describe('Module', function () {
     expect(hook.data).to.have.property('updated_by', 'user-id')
   })
 
+  it('should userstamp create multiple', function () {
+    const hook = {
+      data: [{
+        created_by: 'created_by',
+        updated_by: 'updated_by',
+        something: 'something'
+      }, {
+        created_by: 'created_by',
+        updated_by: 'updated_by',
+        something: 'something-else'
+      }],
+      method: 'create',
+      type: 'before',
+      params: {
+        user: {
+          _id: 'user-id'
+        }
+      }
+    }
+
+    hooks.userstamp()(hook)
+
+    expect(hook).to.have.nested.property('data.0.something', 'something')
+    expect(hook).to.have.nested.property('data.0.created_by', 'user-id')
+    expect(hook).to.have.nested.property('data.0.updated_by', 'user-id')
+
+    expect(hook).to.have.nested.property('data.1.something', 'something-else')
+    expect(hook).to.have.nested.property('data.1.created_by', 'user-id')
+    expect(hook).to.have.nested.property('data.1.updated_by', 'user-id')
+  })
+
   it('should userstamp update', function () {
     const hook = {
       data: {
@@ -310,6 +371,7 @@ describe('Module', function () {
         something: 'something'
       },
       method: 'update',
+      type: 'before',
       params: {
         user: {
           _id: 'user-id'
@@ -332,6 +394,7 @@ describe('Module', function () {
         something: 'something'
       },
       method: 'patch',
+      type: 'before',
       params: {
         user: {
           _id: 'user-id'

@@ -6,7 +6,7 @@
  * @module dendra-api-hooks-common
  */
 
-import {getByDot, setByDot} from 'feathers-hooks-common'
+import {getByDot, setByDot, getItems} from 'feathers-hooks-common'
 import {treeMap} from '@dendra-science/utils'
 
 // Regular expressions for data type detection
@@ -95,14 +95,23 @@ export function splitList (path, sep = ',', options) {
 
 export function timestamp () {
   return (hook) => {
+    const date = new Date()
+
+    let items = getItems(hook)
+    if (!Array.isArray(items)) items = [items]
+
     switch (hook.method) {
       case 'create':
-        hook.data.created_at = new Date()
-        hook.data.updated_at = hook.data.created_at
+        items.forEach(item => {
+          item.created_at = date
+          item.updated_at = date
+        })
         break
       case 'update':
       case 'patch':
-        hook.data.updated_at = new Date()
+        items.forEach(item => {
+          item.updated_at = date
+        })
         break
     }
 
@@ -116,14 +125,21 @@ export function userstamp () {
 
     const id = hook.params.user._id
 
+    let items = getItems(hook)
+    if (!Array.isArray(items)) items = [items]
+
     switch (hook.method) {
       case 'create':
-        hook.data.created_by = id
-        hook.data.updated_by = id
+        items.forEach(item => {
+          item.created_by = id
+          item.updated_by = id
+        })
         break
       case 'update':
       case 'patch':
-        hook.data.updated_by = id
+        items.forEach(item => {
+          item.updated_by = id
+        })
         break
     }
 
