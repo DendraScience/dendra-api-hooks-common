@@ -6,8 +6,8 @@
  * @module dendra-api-hooks-common
  */
 
-import {getByDot, setByDot, getItems} from 'feathers-hooks-common'
-import {treeMap} from '@dendra-science/utils'
+import { getByDot, setByDot, getItems } from 'feathers-hooks-common'
+import { treeMap } from '@dendra-science/utils'
 
 // Regular expressions for data type detection
 const BOOL_REGEX = /^(false|true)$/i

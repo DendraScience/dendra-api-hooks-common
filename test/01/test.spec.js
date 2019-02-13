@@ -2,7 +2,7 @@
  * Main tests
  */
 
-const {ObjectID} = require('mongodb')
+const { ObjectID } = require('mongodb')
 
 describe('Module', function () {
   const date1Str = '2017-05-05T15:00:00.000Z'
@@ -31,7 +31,7 @@ describe('Module', function () {
         ary_ids: [id1Str, id2Str],
         obj: {
           one_id: id1Str,
-          two: {two_id: id2Str}
+          two: { two_id: id2Str }
         }
       }
     }
@@ -55,7 +55,7 @@ describe('Module', function () {
           ary_ids: [id1Str, id2Str],
           obj: {
             one_id: id1Str,
-            two: {two_id: id2Str}
+            two: { two_id: id2Str }
           }
         }
       }
@@ -81,14 +81,14 @@ describe('Module', function () {
         date_value_ary: [date1Str, date2Str],
         date_value_obj: {
           one: date1Str,
-          two: {two: date2Str}
+          two: { two: date2Str }
         },
         str_value: 'abc',
         str_value_num: '\'123',
         str_value_ary: ['def', 'GHI'],
         str_value_obj: {
           one: 'One',
-          two: {two: 'Two'}
+          two: { two: 'Two' }
         }
       }
     }
@@ -103,14 +103,14 @@ describe('Module', function () {
       date_value_ary: [date1, date2],
       date_value_obj: {
         one: date1,
-        two: {two: date2}
+        two: { two: date2 }
       },
       str_value: 'abc',
       str_value_num: '\'123',
       str_value_ary: ['def', 'GHI'],
       str_value_obj: {
         one: 'One',
-        two: {two: 'Two'}
+        two: { two: 'Two' }
       }
     })
   })
@@ -124,28 +124,28 @@ describe('Module', function () {
           bool_value_ary: ['false', 'true'],
           bool_value_obj: {
             f: 'false',
-            t: {t: 'true'}
+            t: { t: 'true' }
           },
           num_value: 12.3,
           num_value_str: '4.56',
           num_value_ary: ['7.89', '010.110'],
           num_value_obj: {
             one: '-1.1',
-            two: {two: '-2.2'}
+            two: { two: '-2.2' }
           },
           date_value: date1,
           date_value_str: date1Str,
           date_value_ary: [date1Str, date2Str],
           date_value_obj: {
             one: date1Str,
-            two: {two: date2Str}
+            two: { two: date2Str }
           },
           str_value: 'abc',
           str_value_num: '\'123',
           str_value_ary: ['def', 'GHI'],
           str_value_obj: {
             one: 'One',
-            two: {two: 'Two'}
+            two: { two: 'Two' }
           }
         }
       }
@@ -159,28 +159,28 @@ describe('Module', function () {
       bool_value_ary: [false, true],
       bool_value_obj: {
         f: false,
-        t: {t: true}
+        t: { t: true }
       },
       num_value: 12.3,
       num_value_str: 4.56,
       num_value_ary: [7.89, 10.11],
       num_value_obj: {
         one: -1.1,
-        two: {two: -2.2}
+        two: { two: -2.2 }
       },
       date_value: date1,
       date_value_str: date1,
       date_value_ary: [date1, date2],
       date_value_obj: {
         one: date1,
-        two: {two: date2}
+        two: { two: date2 }
       },
       str_value: 'abc',
       str_value_num: '\'123',
       str_value_ary: ['def', 'GHI'],
       str_value_obj: {
         one: 'One',
-        two: {two: 'Two'}
+        two: { two: 'Two' }
       }
     })
   })

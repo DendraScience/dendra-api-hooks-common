@@ -1,19 +1,3 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.coerce = coerce;
-exports.coerceQuery = coerceQuery;
-exports.splitList = splitList;
-exports.timestamp = timestamp;
-exports.userstamp = userstamp;
-exports.uniqueArray = uniqueArray;
-
-var _feathersHooksCommon = require("feathers-hooks-common");
-
-var _utils = require("@dendra-science/utils");
-
 /**
  * Useful hooks for use with Dendra/Feathers API services.
  *
@@ -21,7 +5,9 @@ var _utils = require("@dendra-science/utils");
  * @license BSD-2-Clause-FreeBSD
  * @module dendra-api-hooks-common
  */
-// Regular expressions for data type detection
+import { getByDot, setByDot, getItems } from 'feathers-hooks-common';
+import { treeMap } from '@dendra-science/utils'; // Regular expressions for data type detection
+
 const BOOL_REGEX = /^(false|true)$/i;
 const ID_PATH_REGEX = /\/\w*_id(s)?(\/.*)?$/;
 const ID_STRING_REGEX = /^[0-9a-f]{24}$/i;
@@ -61,41 +47,38 @@ function queryCoercer(obj, path) {
   return coercer(obj, path);
 }
 
-function coerce() {
+export function coerce() {
   return hook => {
     if (typeof hook.data === 'undefined') return hook;
-    hook.data = (0, _utils.treeMap)(hook.data, coercer);
+    hook.data = treeMap(hook.data, coercer);
     return hook;
   };
 }
-
-function coerceQuery() {
+export function coerceQuery() {
   return hook => {
     if (typeof hook.params.query !== 'object') return hook;
-    hook.params.query = (0, _utils.treeMap)(hook.params.query, queryCoercer);
+    hook.params.query = treeMap(hook.params.query, queryCoercer);
     return hook;
   };
 }
-
-function splitList(path, sep = ',', options) {
+export function splitList(path, sep = ',', options) {
   const opts = Object.assign({
     trim: true,
     unique: true
   }, options);
   return hook => {
-    const value = (0, _feathersHooksCommon.getByDot)(hook, path);
+    const value = getByDot(hook, path);
     if (typeof value !== 'string') return hook;
     let ary = value.split(sep);
     if (opts.trim) ary = ary.map(item => item.trim()).filter(item => item.length > 0);
-    (0, _feathersHooksCommon.setByDot)(hook, path, opts.unique ? [...new Set(ary)] : ary);
+    setByDot(hook, path, opts.unique ? [...new Set(ary)] : ary);
     return hook;
   };
 }
-
-function timestamp() {
+export function timestamp() {
   return hook => {
     const date = new Date();
-    let items = (0, _feathersHooksCommon.getItems)(hook);
+    let items = getItems(hook);
     if (!Array.isArray(items)) items = [items];
 
     switch (hook.method) {
@@ -117,12 +100,11 @@ function timestamp() {
     return hook;
   };
 }
-
-function userstamp() {
+export function userstamp() {
   return hook => {
     if (typeof hook.params.user !== 'object') return hook;
     const id = hook.params.user._id;
-    let items = (0, _feathersHooksCommon.getItems)(hook);
+    let items = getItems(hook);
     if (!Array.isArray(items)) items = [items];
 
     switch (hook.method) {
@@ -144,11 +126,10 @@ function userstamp() {
     return hook;
   };
 }
-
-function uniqueArray(path) {
+export function uniqueArray(path) {
   return hook => {
-    const ary = (0, _feathersHooksCommon.getByDot)(hook, path);
-    if (Array.isArray(ary)) (0, _feathersHooksCommon.setByDot)(hook, path, [...new Set(ary)]);
+    const ary = getByDot(hook, path);
+    if (Array.isArray(ary)) setByDot(hook, path, [...new Set(ary)]);
     return hook;
   };
 }
