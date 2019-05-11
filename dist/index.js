@@ -23,9 +23,10 @@ var _utils = require("@dendra-science/utils");
  */
 // Regular expressions for data type detection
 const BOOL_REGEX = /^(false|true)$/i;
-const ID_PATH_REGEX = /\/\w*_id(s)?(\/.*)?$/;
+const ID_PATH_REGEX = /\/(\w|\$)*_id(s)?(\/.*)?$/;
 const ID_STRING_REGEX = /^[0-9a-f]{24}$/i;
 const ISO_DATE_REGEX = /^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(.([0-9]{3}))?Z$/i;
+const TEXT_SEARCH_PATH_REGEX = /\/(\w|\$)*\$text\/\$search$/;
 
 function checkModule(name) {
   try {
@@ -52,7 +53,9 @@ function coercer(obj, path) {
 }
 
 function queryCoercer(obj, path) {
-  if (typeof obj !== 'string') return obj; // Boolean
+  if (typeof obj !== 'string') return obj; // Mongo full text search
+
+  if (TEXT_SEARCH_PATH_REGEX.test(path)) return obj; // Boolean
 
   if (BOOL_REGEX.test(obj)) return obj === 'true'; // Numeric
 
@@ -62,18 +65,18 @@ function queryCoercer(obj, path) {
 }
 
 function coerce() {
-  return hook => {
-    if (typeof hook.data === 'undefined') return hook;
-    hook.data = (0, _utils.treeMap)(hook.data, coercer);
-    return hook;
+  return context => {
+    if (typeof context.data === 'undefined') return context;
+    context.data = (0, _utils.treeMap)(context.data, coercer);
+    return context;
   };
 }
 
 function coerceQuery() {
-  return hook => {
-    if (typeof hook.params.query !== 'object') return hook;
-    hook.params.query = (0, _utils.treeMap)(hook.params.query, queryCoercer);
-    return hook;
+  return context => {
+    if (typeof context.params.query !== 'object') return context;
+    context.params.query = (0, _utils.treeMap)(context.params.query, queryCoercer);
+    return context;
   };
 }
 
@@ -82,23 +85,23 @@ function splitList(path, sep = ',', options) {
     trim: true,
     unique: true
   }, options);
-  return hook => {
-    const value = (0, _feathersHooksCommon.getByDot)(hook, path);
-    if (typeof value !== 'string') return hook;
+  return context => {
+    const value = (0, _feathersHooksCommon.getByDot)(context, path);
+    if (typeof value !== 'string') return context;
     let ary = value.split(sep);
     if (opts.trim) ary = ary.map(item => item.trim()).filter(item => item.length > 0);
-    (0, _feathersHooksCommon.setByDot)(hook, path, opts.unique ? [...new Set(ary)] : ary);
-    return hook;
+    (0, _feathersHooksCommon.setByDot)(context, path, opts.unique ? [...new Set(ary)] : ary);
+    return context;
   };
 }
 
 function timestamp() {
-  return hook => {
+  return context => {
     const date = new Date();
-    let items = (0, _feathersHooksCommon.getItems)(hook);
+    let items = (0, _feathersHooksCommon.getItems)(context);
     if (!Array.isArray(items)) items = [items];
 
-    switch (hook.method) {
+    switch (context.method) {
       case 'create':
         items.forEach(item => {
           item.created_at = date;
@@ -114,18 +117,18 @@ function timestamp() {
         break;
     }
 
-    return hook;
+    return context;
   };
 }
 
 function userstamp() {
-  return hook => {
-    if (typeof hook.params.user !== 'object') return hook;
-    const id = hook.params.user._id;
-    let items = (0, _feathersHooksCommon.getItems)(hook);
+  return context => {
+    if (typeof context.params.user !== 'object') return context;
+    const id = context.params.user._id;
+    let items = (0, _feathersHooksCommon.getItems)(context);
     if (!Array.isArray(items)) items = [items];
 
-    switch (hook.method) {
+    switch (context.method) {
       case 'create':
         items.forEach(item => {
           item.created_by = id;
@@ -141,14 +144,14 @@ function userstamp() {
         break;
     }
 
-    return hook;
+    return context;
   };
 }
 
 function uniqueArray(path) {
-  return hook => {
-    const ary = (0, _feathersHooksCommon.getByDot)(hook, path);
-    if (Array.isArray(ary)) (0, _feathersHooksCommon.setByDot)(hook, path, [...new Set(ary)]);
-    return hook;
+  return context => {
+    const ary = (0, _feathersHooksCommon.getByDot)(context, path);
+    if (Array.isArray(ary)) (0, _feathersHooksCommon.setByDot)(context, path, [...new Set(ary)]);
+    return context;
   };
 }

@@ -11,11 +11,12 @@ import { treeMap } from '@dendra-science/utils'
 
 // Regular expressions for data type detection
 const BOOL_REGEX = /^(false|true)$/i
-const ID_PATH_REGEX = /\/\w*_id(s)?(\/.*)?$/
+const ID_PATH_REGEX = /\/(\w|\$)*_id(s)?(\/.*)?$/
 const ID_STRING_REGEX = /^[0-9a-f]{24}$/i
 const ISO_DATE_REGEX = /^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(.([0-9]{3}))?Z$/i
+const TEXT_SEARCH_PATH_REGEX = /\/(\w|\$)*\$text\/\$search$/
 
-function checkModule (name) {
+function checkModule(name) {
   try {
     return typeof require.resolve(name) === 'string'
   } catch (e) {
@@ -26,7 +27,7 @@ function checkModule (name) {
 let ObjectID
 if (checkModule('mongodb')) ObjectID = require('mongodb').ObjectID
 
-function coercer (obj, path) {
+function coercer(obj, path) {
   if (typeof obj !== 'string') return obj
 
   // Date
@@ -36,16 +37,20 @@ function coercer (obj, path) {
   }
 
   // ObjectID (strict)
-  if (ObjectID && ID_PATH_REGEX.test(path) && ID_STRING_REGEX.test(obj)) return new ObjectID(obj.toString())
+  if (ObjectID && ID_PATH_REGEX.test(path) && ID_STRING_REGEX.test(obj))
+    return new ObjectID(obj.toString())
 
   return obj
 }
 
-function queryCoercer (obj, path) {
+function queryCoercer(obj, path) {
   if (typeof obj !== 'string') return obj
 
+  // Mongo full text search
+  if (TEXT_SEARCH_PATH_REGEX.test(path)) return obj
+
   // Boolean
-  if (BOOL_REGEX.test(obj)) return (obj === 'true')
+  if (BOOL_REGEX.test(obj)) return obj === 'true'
 
   // Numeric
   const n = parseFloat(obj)
@@ -54,53 +59,57 @@ function queryCoercer (obj, path) {
   return coercer(obj, path)
 }
 
-export function coerce () {
-  return (hook) => {
-    if (typeof hook.data === 'undefined') return hook
+export function coerce() {
+  return context => {
+    if (typeof context.data === 'undefined') return context
 
-    hook.data = treeMap(hook.data, coercer)
+    context.data = treeMap(context.data, coercer)
 
-    return hook
+    return context
   }
 }
 
-export function coerceQuery () {
-  return (hook) => {
-    if (typeof hook.params.query !== 'object') return hook
+export function coerceQuery() {
+  return context => {
+    if (typeof context.params.query !== 'object') return context
 
-    hook.params.query = treeMap(hook.params.query, queryCoercer)
+    context.params.query = treeMap(context.params.query, queryCoercer)
 
-    return hook
+    return context
   }
 }
 
-export function splitList (path, sep = ',', options) {
-  const opts = Object.assign({
-    trim: true,
-    unique: true
-  }, options)
+export function splitList(path, sep = ',', options) {
+  const opts = Object.assign(
+    {
+      trim: true,
+      unique: true
+    },
+    options
+  )
 
-  return (hook) => {
-    const value = getByDot(hook, path)
-    if (typeof value !== 'string') return hook
+  return context => {
+    const value = getByDot(context, path)
+    if (typeof value !== 'string') return context
 
     let ary = value.split(sep)
-    if (opts.trim) ary = ary.map(item => item.trim()).filter(item => item.length > 0)
+    if (opts.trim)
+      ary = ary.map(item => item.trim()).filter(item => item.length > 0)
 
-    setByDot(hook, path, opts.unique ? [...new Set(ary)] : ary)
+    setByDot(context, path, opts.unique ? [...new Set(ary)] : ary)
 
-    return hook
+    return context
   }
 }
 
-export function timestamp () {
-  return (hook) => {
+export function timestamp() {
+  return context => {
     const date = new Date()
 
-    let items = getItems(hook)
+    let items = getItems(context)
     if (!Array.isArray(items)) items = [items]
 
-    switch (hook.method) {
+    switch (context.method) {
       case 'create':
         items.forEach(item => {
           item.created_at = date
@@ -115,20 +124,20 @@ export function timestamp () {
         break
     }
 
-    return hook
+    return context
   }
 }
 
-export function userstamp () {
-  return (hook) => {
-    if (typeof hook.params.user !== 'object') return hook
+export function userstamp() {
+  return context => {
+    if (typeof context.params.user !== 'object') return context
 
-    const id = hook.params.user._id
+    const id = context.params.user._id
 
-    let items = getItems(hook)
+    let items = getItems(context)
     if (!Array.isArray(items)) items = [items]
 
-    switch (hook.method) {
+    switch (context.method) {
       case 'create':
         items.forEach(item => {
           item.created_by = id
@@ -143,15 +152,15 @@ export function userstamp () {
         break
     }
 
-    return hook
+    return context
   }
 }
 
-export function uniqueArray (path) {
-  return (hook) => {
-    const ary = getByDot(hook, path)
-    if (Array.isArray(ary)) setByDot(hook, path, [...new Set(ary)])
+export function uniqueArray(path) {
+  return context => {
+    const ary = getByDot(context, path)
+    if (Array.isArray(ary)) setByDot(context, path, [...new Set(ary)])
 
-    return hook
+    return context
   }
 }

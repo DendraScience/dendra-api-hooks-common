@@ -4,7 +4,7 @@
 
 const { ObjectID } = require('mongodb')
 
-describe('Module', function () {
+describe('Module', function() {
   const date1Str = '2017-05-05T15:00:00.000Z'
   const date2Str = '2017-06-06T16:30:10Z'
   const date1 = new Date(date1Str)
@@ -16,14 +16,14 @@ describe('Module', function () {
 
   let hooks
 
-  it('should import', function () {
+  it('should import', function() {
     hooks = require('../../dist')
 
     expect(hooks).to.have.property('coerce')
     expect(hooks).to.have.property('coerceQuery')
   })
 
-  it('should coerce object ids in data', function () {
+  it('should coerce object ids in data', function() {
     const hook = {
       data: {
         _id: id1,
@@ -32,6 +32,10 @@ describe('Module', function () {
         obj: {
           one_id: id1Str,
           two: { two_id: id2Str }
+        },
+        $obj: {
+          $one_id: id1Str,
+          $$two: { two_id: id2Str }
         }
       }
     }
@@ -43,10 +47,18 @@ describe('Module', function () {
     assert.isOk(hook.data.ary_ids[0].equals(id1), 'ary_ids[0] equals id1')
     assert.isOk(hook.data.ary_ids[1].equals(id2), 'ary_ids[1] equals id2')
     assert.isOk(hook.data.obj.one_id.equals(id1), 'obj.one_id equals id1')
-    assert.isOk(hook.data.obj.two.two_id.equals(id2), 'obj.two.two_id equals id2')
+    assert.isOk(
+      hook.data.obj.two.two_id.equals(id2),
+      'obj.two.two_id equals id2'
+    )
+    assert.isOk(hook.data.$obj.$one_id.equals(id1), '$obj.$one_id equals id1')
+    assert.isOk(
+      hook.data.$obj.$$two.two_id.equals(id2),
+      '$obj.$$two.two_id equals id2'
+    )
   })
 
-  it('should coerce object ids in query params', function () {
+  it('should coerce object ids in query params', function() {
     const hook = {
       params: {
         query: {
@@ -56,6 +68,10 @@ describe('Module', function () {
           obj: {
             one_id: id1Str,
             two: { two_id: id2Str }
+          },
+          $obj: {
+            $one_id: id1Str,
+            $$two: { two_id: id2Str }
           }
         }
       }
@@ -65,13 +81,33 @@ describe('Module', function () {
 
     assert.isOk(hook.params.query._id.equals(id1), '_id equals id1')
     assert.isOk(hook.params.query.str_id.equals(id1), 'str_id equals id1')
-    assert.isOk(hook.params.query.ary_ids[0].equals(id1), 'ary_ids[0] equals id1')
-    assert.isOk(hook.params.query.ary_ids[1].equals(id2), 'ary_ids[1] equals id2')
-    assert.isOk(hook.params.query.obj.one_id.equals(id1), 'obj.one_id equals id1')
-    assert.isOk(hook.params.query.obj.two.two_id.equals(id2), 'obj.two.two_id equals id2')
+    assert.isOk(
+      hook.params.query.ary_ids[0].equals(id1),
+      'ary_ids[0] equals id1'
+    )
+    assert.isOk(
+      hook.params.query.ary_ids[1].equals(id2),
+      'ary_ids[1] equals id2'
+    )
+    assert.isOk(
+      hook.params.query.obj.one_id.equals(id1),
+      'obj.one_id equals id1'
+    )
+    assert.isOk(
+      hook.params.query.obj.two.two_id.equals(id2),
+      'obj.two.two_id equals id2'
+    )
+    assert.isOk(
+      hook.params.query.$obj.$one_id.equals(id1),
+      '$obj.$one_id equals id1'
+    )
+    assert.isOk(
+      hook.params.query.$obj.$$two.two_id.equals(id2),
+      '$obj.$$two.two_id equals id2'
+    )
   })
 
-  it('should coerce values in data', function () {
+  it('should coerce values in data', function() {
     const hook = {
       data: {
         bool_value: true,
@@ -84,7 +120,7 @@ describe('Module', function () {
           two: { two: date2Str }
         },
         str_value: 'abc',
-        str_value_num: '\'123',
+        str_value_num: "'123",
         str_value_ary: ['def', 'GHI'],
         str_value_obj: {
           one: 'One',
@@ -106,7 +142,7 @@ describe('Module', function () {
         two: { two: date2 }
       },
       str_value: 'abc',
-      str_value_num: '\'123',
+      str_value_num: "'123",
       str_value_ary: ['def', 'GHI'],
       str_value_obj: {
         one: 'One',
@@ -115,7 +151,7 @@ describe('Module', function () {
     })
   })
 
-  it('should coerce values in query params', function () {
+  it('should coerce values in query params', function() {
     const hook = {
       params: {
         query: {
@@ -141,11 +177,19 @@ describe('Module', function () {
             two: { two: date2Str }
           },
           str_value: 'abc',
-          str_value_num: '\'123',
+          str_value_num: "'123",
           str_value_ary: ['def', 'GHI'],
           str_value_obj: {
             one: 'One',
             two: { two: 'Two' }
+          },
+          $text: {
+            $search: '10'
+          },
+          $op: {
+            $text: {
+              $search: '20'
+            }
           }
         }
       }
@@ -176,16 +220,24 @@ describe('Module', function () {
         two: { two: date2 }
       },
       str_value: 'abc',
-      str_value_num: '\'123',
+      str_value_num: "'123",
       str_value_ary: ['def', 'GHI'],
       str_value_obj: {
         one: 'One',
         two: { two: 'Two' }
+      },
+      $text: {
+        $search: '10'
+      },
+      $op: {
+        $text: {
+          $search: '20'
+        }
       }
     })
   })
 
-  it('should split list values', function () {
+  it('should split list values', function() {
     const hook = {
       params: {
         query: {
@@ -229,7 +281,7 @@ describe('Module', function () {
     })
   })
 
-  it('should timestamp create', function () {
+  it('should timestamp create', function() {
     const hook = {
       data: {
         created_at: 'created_at',
@@ -243,21 +295,28 @@ describe('Module', function () {
     hooks.timestamp()(hook)
 
     expect(hook.data).to.have.property('something', 'something')
-    expect(hook.data).to.have.property('created_at').to.be.a('date')
-    expect(hook.data).to.have.property('updated_at').to.be.a('date')
+    expect(hook.data)
+      .to.have.property('created_at')
+      .to.be.a('date')
+    expect(hook.data)
+      .to.have.property('updated_at')
+      .to.be.a('date')
   })
 
-  it('should timestamp create multiple', function () {
+  it('should timestamp create multiple', function() {
     const hook = {
-      data: [{
-        created_at: 'created_at',
-        updated_at: 'updated_at',
-        something: 'something'
-      }, {
-        created_at: 'created_at',
-        updated_at: 'updated_at',
-        something: 'something-else'
-      }],
+      data: [
+        {
+          created_at: 'created_at',
+          updated_at: 'updated_at',
+          something: 'something'
+        },
+        {
+          created_at: 'created_at',
+          updated_at: 'updated_at',
+          something: 'something-else'
+        }
+      ],
       method: 'create',
       type: 'before'
     }
@@ -265,15 +324,23 @@ describe('Module', function () {
     hooks.timestamp()(hook)
 
     expect(hook).to.have.nested.property('data.0.something', 'something')
-    expect(hook).to.have.nested.property('data.0.created_at').to.be.a('date')
-    expect(hook).to.have.nested.property('data.0.updated_at').to.be.a('date')
+    expect(hook)
+      .to.have.nested.property('data.0.created_at')
+      .to.be.a('date')
+    expect(hook)
+      .to.have.nested.property('data.0.updated_at')
+      .to.be.a('date')
 
     expect(hook).to.have.nested.property('data.1.something', 'something-else')
-    expect(hook).to.have.nested.property('data.1.created_at').to.be.a('date')
-    expect(hook).to.have.nested.property('data.1.updated_at').to.be.a('date')
+    expect(hook)
+      .to.have.nested.property('data.1.created_at')
+      .to.be.a('date')
+    expect(hook)
+      .to.have.nested.property('data.1.updated_at')
+      .to.be.a('date')
   })
 
-  it('should timestamp update', function () {
+  it('should timestamp update', function() {
     const hook = {
       data: {
         created_at: 'created_at',
@@ -288,10 +355,12 @@ describe('Module', function () {
 
     expect(hook.data).to.have.property('something', 'something')
     expect(hook.data).to.have.property('created_at', 'created_at')
-    expect(hook.data).to.have.property('updated_at').to.be.a('date')
+    expect(hook.data)
+      .to.have.property('updated_at')
+      .to.be.a('date')
   })
 
-  it('should timestamp patch', function () {
+  it('should timestamp patch', function() {
     const hook = {
       data: {
         created_at: 'created_at',
@@ -306,10 +375,12 @@ describe('Module', function () {
 
     expect(hook.data).to.have.property('something', 'something')
     expect(hook.data).to.have.property('created_at', 'created_at')
-    expect(hook.data).to.have.property('updated_at').to.be.a('date')
+    expect(hook.data)
+      .to.have.property('updated_at')
+      .to.be.a('date')
   })
 
-  it('should userstamp create', function () {
+  it('should userstamp create', function() {
     const hook = {
       data: {
         created_by: 'created_by',
@@ -332,17 +403,20 @@ describe('Module', function () {
     expect(hook.data).to.have.property('updated_by', 'user-id')
   })
 
-  it('should userstamp create multiple', function () {
+  it('should userstamp create multiple', function() {
     const hook = {
-      data: [{
-        created_by: 'created_by',
-        updated_by: 'updated_by',
-        something: 'something'
-      }, {
-        created_by: 'created_by',
-        updated_by: 'updated_by',
-        something: 'something-else'
-      }],
+      data: [
+        {
+          created_by: 'created_by',
+          updated_by: 'updated_by',
+          something: 'something'
+        },
+        {
+          created_by: 'created_by',
+          updated_by: 'updated_by',
+          something: 'something-else'
+        }
+      ],
       method: 'create',
       type: 'before',
       params: {
@@ -363,7 +437,7 @@ describe('Module', function () {
     expect(hook).to.have.nested.property('data.1.updated_by', 'user-id')
   })
 
-  it('should userstamp update', function () {
+  it('should userstamp update', function() {
     const hook = {
       data: {
         created_by: 'created_by',
@@ -386,7 +460,7 @@ describe('Module', function () {
     expect(hook.data).to.have.property('updated_by', 'user-id')
   })
 
-  it('should userstamp patch', function () {
+  it('should userstamp patch', function() {
     const hook = {
       data: {
         created_by: 'created_by',
@@ -409,7 +483,7 @@ describe('Module', function () {
     expect(hook.data).to.have.property('updated_by', 'user-id')
   })
 
-  it('should unique array values', function () {
+  it('should unique array values', function() {
     const hook = {
       data: {
         manyItemsUnique: ['item1', 'item2', 'item3'],

@@ -2,10 +2,9 @@
 
 Defines a set of useful, general purpose Feathers service hooks to be used with Dendra API services.
 
-
 ## Instructions
 
-1. Be sure you have Node version 6.11.x. If you’re using nvm, you may need to `nvm use 6.11`.
+1. Be sure you have Node version 10.15.x. If you’re using nvm, you may need to `nvm use 10.15.x`.
 
 2. Clone this repo.
 
