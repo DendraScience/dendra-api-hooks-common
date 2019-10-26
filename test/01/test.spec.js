@@ -13,6 +13,10 @@ describe('Module', function() {
   const id2Str = '592f155746a1b867a114e020'
   const id1 = new ObjectID(id1Str)
   const id2 = new ObjectID(id2Str)
+  const naiveDate1Str = '2017-05-05T15:00:00.000'
+  const naiveDate2Str = '2017-06-06T16:30:10'
+  const naiveDate1 = new Date(`${naiveDate1Str}Z`)
+  const naiveDate2 = new Date(`${naiveDate2Str}Z`)
 
   let hooks
 
@@ -21,6 +25,7 @@ describe('Module', function() {
 
     expect(hooks).to.have.property('coerce')
     expect(hooks).to.have.property('coerceQuery')
+    expect(hooks).to.have.property('coercer')
   })
 
   it('should coerce object ids in data', function() {
@@ -233,6 +238,34 @@ describe('Module', function() {
         $text: {
           $search: '20'
         }
+      }
+    })
+  })
+
+  it('should coerce naive dates in query params', function() {
+    const hook = {
+      params: {
+        query: {
+          date_value: naiveDate1,
+          date_value_str: naiveDate1Str,
+          date_value_ary: [naiveDate1Str, naiveDate2Str],
+          date_value_obj: {
+            one: naiveDate1Str,
+            two: { two: naiveDate2Str }
+          }
+        }
+      }
+    }
+
+    hooks.coerceQuery({ naive: true })(hook)
+
+    assert.deepEqual(hook.params.query, {
+      date_value: naiveDate1,
+      date_value_str: naiveDate1,
+      date_value_ary: [naiveDate1, naiveDate2],
+      date_value_obj: {
+        one: naiveDate1,
+        two: { two: naiveDate2 }
       }
     })
   })
