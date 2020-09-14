@@ -5,7 +5,9 @@
  * @license BSD-2-Clause-FreeBSD
  * @module dendra-api-hooks-common
  */
-import { getByDot, setByDot, getItems } from 'feathers-hooks-common';
+import getByDot from 'lodash/get';
+import setByDot from 'lodash/set';
+import { getItems } from 'feathers-hooks-common';
 import { treeMap } from '@dendra-science/utils'; // Regular expressions for data type detection
 
 const BOOL_REGEX = /^(false|true)$/i;

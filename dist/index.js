@@ -11,9 +11,15 @@ exports.timestamp = timestamp;
 exports.userstamp = userstamp;
 exports.uniqueArray = uniqueArray;
 
+var _get = _interopRequireDefault(require("lodash/get"));
+
+var _set = _interopRequireDefault(require("lodash/set"));
+
 var _feathersHooksCommon = require("feathers-hooks-common");
 
 var _utils = require("@dendra-science/utils");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * Useful hooks for use with Dendra/Feathers API services.
@@ -22,6 +28,7 @@ var _utils = require("@dendra-science/utils");
  * @license BSD-2-Clause-FreeBSD
  * @module dendra-api-hooks-common
  */
+// Regular expressions for data type detection
 const BOOL_REGEX = /^(false|true)$/i;
 const ID_PATH_REGEX = /\/(\w|\$)*_id(s)?(\/.*)?$/;
 const ID_STRING_REGEX = /^[0-9a-f]{24}$/i;
@@ -99,11 +106,11 @@ function splitList(path, sep = ',', options) {
     unique: true
   }, options);
   return context => {
-    const value = (0, _feathersHooksCommon.getByDot)(context, path);
+    const value = (0, _get.default)(context, path);
     if (typeof value !== 'string') return context;
     let ary = value.split(sep);
     if (opts.trim) ary = ary.map(item => item.trim()).filter(item => item.length > 0);
-    (0, _feathersHooksCommon.setByDot)(context, path, opts.unique ? [...new Set(ary)] : ary);
+    (0, _set.default)(context, path, opts.unique ? [...new Set(ary)] : ary);
     return context;
   };
 }
@@ -163,8 +170,8 @@ function userstamp() {
 
 function uniqueArray(path) {
   return context => {
-    const ary = (0, _feathersHooksCommon.getByDot)(context, path);
-    if (Array.isArray(ary)) (0, _feathersHooksCommon.setByDot)(context, path, [...new Set(ary)]);
+    const ary = (0, _get.default)(context, path);
+    if (Array.isArray(ary)) (0, _set.default)(context, path, [...new Set(ary)]);
     return context;
   };
 }

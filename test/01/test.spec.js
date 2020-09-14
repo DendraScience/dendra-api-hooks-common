@@ -4,7 +4,7 @@
 
 const { ObjectID } = require('mongodb')
 
-describe('Module', function() {
+describe('Module', function () {
   const date1Str = '2017-05-05T15:00:00.000Z'
   const date2Str = '2017-06-06T16:30:10Z'
   const date1 = new Date(date1Str)
@@ -20,7 +20,7 @@ describe('Module', function() {
 
   let hooks
 
-  it('should import', function() {
+  it('should import', function () {
     hooks = require('../../dist')
 
     expect(hooks).to.have.property('coerce')
@@ -28,7 +28,7 @@ describe('Module', function() {
     expect(hooks).to.have.property('coercer')
   })
 
-  it('should coerce object ids in data', function() {
+  it('should coerce object ids in data', function () {
     const hook = {
       data: {
         _id: id1,
@@ -63,7 +63,7 @@ describe('Module', function() {
     )
   })
 
-  it('should coerce object ids in query params', function() {
+  it('should coerce object ids in query params', function () {
     const hook = {
       params: {
         query: {
@@ -112,7 +112,7 @@ describe('Module', function() {
     )
   })
 
-  it('should coerce values in data', function() {
+  it('should coerce values in data', function () {
     const hook = {
       data: {
         bool_value: true,
@@ -156,7 +156,7 @@ describe('Module', function() {
     })
   })
 
-  it('should coerce values in query params', function() {
+  it('should coerce values in query params', function () {
     const hook = {
       params: {
         query: {
@@ -242,7 +242,7 @@ describe('Module', function() {
     })
   })
 
-  it('should coerce naive dates in query params', function() {
+  it('should coerce naive dates in query params', function () {
     const hook = {
       params: {
         query: {
@@ -270,7 +270,7 @@ describe('Module', function() {
     })
   })
 
-  it('should split list values', function() {
+  it('should split list values', function () {
     const hook = {
       params: {
         query: {
@@ -314,7 +314,7 @@ describe('Module', function() {
     })
   })
 
-  it('should timestamp create', function() {
+  it('should timestamp create', function () {
     const hook = {
       data: {
         created_at: 'created_at',
@@ -328,15 +328,11 @@ describe('Module', function() {
     hooks.timestamp()(hook)
 
     expect(hook.data).to.have.property('something', 'something')
-    expect(hook.data)
-      .to.have.property('created_at')
-      .to.be.a('date')
-    expect(hook.data)
-      .to.have.property('updated_at')
-      .to.be.a('date')
+    expect(hook.data).to.have.property('created_at').to.be.a('date')
+    expect(hook.data).to.have.property('updated_at').to.be.a('date')
   })
 
-  it('should timestamp create multiple', function() {
+  it('should timestamp create multiple', function () {
     const hook = {
       data: [
         {
@@ -357,23 +353,15 @@ describe('Module', function() {
     hooks.timestamp()(hook)
 
     expect(hook).to.have.nested.property('data.0.something', 'something')
-    expect(hook)
-      .to.have.nested.property('data.0.created_at')
-      .to.be.a('date')
-    expect(hook)
-      .to.have.nested.property('data.0.updated_at')
-      .to.be.a('date')
+    expect(hook).to.have.nested.property('data.0.created_at').to.be.a('date')
+    expect(hook).to.have.nested.property('data.0.updated_at').to.be.a('date')
 
     expect(hook).to.have.nested.property('data.1.something', 'something-else')
-    expect(hook)
-      .to.have.nested.property('data.1.created_at')
-      .to.be.a('date')
-    expect(hook)
-      .to.have.nested.property('data.1.updated_at')
-      .to.be.a('date')
+    expect(hook).to.have.nested.property('data.1.created_at').to.be.a('date')
+    expect(hook).to.have.nested.property('data.1.updated_at').to.be.a('date')
   })
 
-  it('should timestamp update', function() {
+  it('should timestamp update', function () {
     const hook = {
       data: {
         created_at: 'created_at',
@@ -388,12 +376,10 @@ describe('Module', function() {
 
     expect(hook.data).to.have.property('something', 'something')
     expect(hook.data).to.have.property('created_at', 'created_at')
-    expect(hook.data)
-      .to.have.property('updated_at')
-      .to.be.a('date')
+    expect(hook.data).to.have.property('updated_at').to.be.a('date')
   })
 
-  it('should timestamp patch', function() {
+  it('should timestamp patch', function () {
     const hook = {
       data: {
         created_at: 'created_at',
@@ -408,12 +394,10 @@ describe('Module', function() {
 
     expect(hook.data).to.have.property('something', 'something')
     expect(hook.data).to.have.property('created_at', 'created_at')
-    expect(hook.data)
-      .to.have.property('updated_at')
-      .to.be.a('date')
+    expect(hook.data).to.have.property('updated_at').to.be.a('date')
   })
 
-  it('should userstamp create', function() {
+  it('should userstamp create', function () {
     const hook = {
       data: {
         created_by: 'created_by',
@@ -436,7 +420,7 @@ describe('Module', function() {
     expect(hook.data).to.have.property('updated_by', 'user-id')
   })
 
-  it('should userstamp create multiple', function() {
+  it('should userstamp create multiple', function () {
     const hook = {
       data: [
         {
@@ -470,7 +454,7 @@ describe('Module', function() {
     expect(hook).to.have.nested.property('data.1.updated_by', 'user-id')
   })
 
-  it('should userstamp update', function() {
+  it('should userstamp update', function () {
     const hook = {
       data: {
         created_by: 'created_by',
@@ -493,7 +477,7 @@ describe('Module', function() {
     expect(hook.data).to.have.property('updated_by', 'user-id')
   })
 
-  it('should userstamp patch', function() {
+  it('should userstamp patch', function () {
     const hook = {
       data: {
         created_by: 'created_by',
@@ -516,7 +500,7 @@ describe('Module', function() {
     expect(hook.data).to.have.property('updated_by', 'user-id')
   })
 
-  it('should unique array values', function() {
+  it('should unique array values', function () {
     const hook = {
       data: {
         manyItemsUnique: ['item1', 'item2', 'item3'],

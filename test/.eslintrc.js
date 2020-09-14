@@ -13,9 +13,6 @@ module.exports = {
   rules: {
     'prettier/prettier': 'error'
   },
-  parserOptions: {
-    sourceType: 'module'
-  },
   globals: {
     assert: true,
     expect: true
