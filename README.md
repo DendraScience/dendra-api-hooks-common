@@ -4,7 +4,7 @@ Defines a set of useful, general purpose Feathers service hooks to be used with 
 
 ## Instructions
 
-1. Be sure you have Node version 10.15.x. If you’re using nvm, you may need to `nvm use 10.15.x`.
+1. Be sure you have Node version 12.14.x. If you’re using nvm, you may need to `nvm use 12.14`.
 
 2. Clone this repo.
 
